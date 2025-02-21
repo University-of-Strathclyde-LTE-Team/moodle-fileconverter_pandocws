@@ -24,20 +24,19 @@
 
  require(__DIR__ . '/../../../config.php');
  require_once($CFG->libdir . '/filelib.php');
+use moodle_url;
+$actions = ['send', 'poll', 'download'];
+$action = optional_param('action', "send", PARAM_ALPHA);
 
- $actions = ['send', 'poll', 'download'];
- $action = optional_param('action', "send", PARAM_ALPHA);
+$PAGE->set_url(new moodle_url('/files/converter/pandocws/test.php'));
+$PAGE->set_context(context_system::instance());
 
- $PAGE->set_url(new moodle_url('/files/converter/pandocws/test.php'));
- $PAGE->set_context(context_system::instance());
- 
- require_login();
- require_capability('moodle/site:config', context_system::instance());
- 
- $converter = new \fileconverter_pandocws\converter();
+require_login();
+require_capability('moodle/site:config', context_system::instance());
+
+$converter = new \fileconverter_pandocws\converter();
 switch($action) {
     case "send":
-        // require_sesskey();
         $converter->serve_test_document();
         die();
     case 'poll':

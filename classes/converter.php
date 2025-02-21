@@ -21,8 +21,9 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
 
 use stored_file;
-use \core_files\conversion;
+use core_files\conversion;
 use CURLFile;
+use core_files\converter_interface;
 
 /**
  * Class converter
@@ -31,12 +32,10 @@ use CURLFile;
  * @copyright  2025 University Of Strathclyde <education-technology@strath.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class converter implements \core_files\converter_interface {
+class converter implements converter_interface {
 
     protected $wsurl = "http://172.26.229.18:5000/";
-    //protected $wsurl = "http://localhost:5000/";
 	public static function are_requirements_met(): bool {
-		// Implement the logic to check if requirements are met
 		return true;
 	}
 
@@ -46,8 +45,6 @@ class converter implements \core_files\converter_interface {
         $filename = $sourcefile->get_filename();
         $fileext = pathinfo($filename, PATHINFO_EXTENSION);
 
-        // $sourcefile->add_to_curl_request($curl, 'file');
-        // print_r($curl);
         $response = $curl->post($this->wsurl . 'convert', [
             'input_format' => $fileext,
             'output_format' => $conversion->get('targetformat'),
