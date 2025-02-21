@@ -34,11 +34,21 @@ use core_files\converter_interface;
  */
 class converter implements converter_interface {
 
+    /**
+     * The URL of the Pandoc Web Service.
+     * TODO: move to a settting.
+     */
     protected $wsurl = "http://172.26.229.18:5000/";
+    /**
+     * 
+     */
 	public static function are_requirements_met(): bool {
 		return true;
 	}
 
+    /**
+     * Send a stored file to conversion web service.
+     */
 	public function start_document_conversion(\core_files\conversion $conversion) {
         $curl = new \curl();
         $sourcefile = $conversion->get_sourcefile();
@@ -66,6 +76,9 @@ class converter implements converter_interface {
 		return $this;
 	}
 
+    /**
+     * Check the status with the web service about the conversion's state.
+     */
 	public function poll_conversion_status(conversion $conversion) {
 		$taskdata = $conversion->get('data');
         $taskid = $taskdata->task_id;
@@ -101,6 +114,10 @@ class converter implements converter_interface {
         }
 		return $this;
 	}
+
+    /**
+     * Download the converted file and store it locally.
+     */
     protected function store_converted($conversion) {
         try {
             $taskdata = $conversion->get('data');
@@ -124,25 +141,36 @@ class converter implements converter_interface {
             return false;
         }
     }
+    /**
+     * Array of supported from->to formats.
+     */
     protected $supported = [
         'docx' => ['pdf', 'html', 'docx'],
         'html' => ['pdf'],
     ];
 
+    /**
+     * 
+     */
 	public static function supports($from, $to): bool {
-		// Implement the logic to check if the target format is supported
-       
+		// TODO map on to pandoc supporterd formats.
         if (isset($supported[$from]) && in_array($to, $supported[$from])) {
             return true;
         }
 		return false;
 	}
 
+    /**
+     * 
+     */
 	public function get_supported_conversions() {
-		// Implement the logic to get supported conversions
+		// TODO map on to pandoc supporterd formats.
 		return implode(", ", array_keys($this->supported));
 	}
 
+    /**
+     * 
+     */
     public function serve_test_document() {
         global $CFG, $OUTPUT;
         require_once($CFG->libdir . '/filelib.php');
