@@ -35,21 +35,21 @@ use core_files\converter_interface;
 class converter implements converter_interface {
 
     /**
-     * The URL of the Pandoc Web Service.
      * TODO: move to a settting.
+     * @var string $wsurl The URL of the Pandoc Web Service.
      */
     protected $wsurl = "http://172.26.229.18:5000/";
     /**
      * 
      */
-	public static function are_requirements_met(): bool {
-		return true;
-	}
+    public static function are_requirements_met(): bool {
+        return true;
+    }
 
     /**
      * Send a stored file to conversion web service.
      */
-	public function start_document_conversion(\core_files\conversion $conversion) {
+    public function start_document_conversion(\core_files\conversion $conversion) {
         $curl = new \curl();
         $sourcefile = $conversion->get_sourcefile();
         $filename = $sourcefile->get_filename();
@@ -73,14 +73,14 @@ class converter implements converter_interface {
             $conversion->set('data', $result);  // Stash the response data so we can poll the server later..
             $conversion->update();
         }
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Check the status with the web service about the conversion's state.
      */
-	public function poll_conversion_status(conversion $conversion) {
-		$taskdata = $conversion->get('data');
+    public function poll_conversion_status(conversion $conversion) {
+        $taskdata = $conversion->get('data');
         $taskid = $taskdata->task_id;
         // We make a call to the /status endpoint of the Pandoc Web Service.
         $headers = [];
@@ -112,8 +112,8 @@ class converter implements converter_interface {
             }
             $conversion->update();
         }
-		return $this;
-	}
+        return $this;
+    }
 
     /**
      * Download the converted file and store it locally.
@@ -152,21 +152,21 @@ class converter implements converter_interface {
     /**
      * 
      */
-	public static function supports($from, $to): bool {
-		// TODO map on to pandoc supporterd formats.
+    public static function supports($from, $to): bool {
+        // TODO map on to pandoc supporterd formats.
         if (isset($supported[$from]) && in_array($to, $supported[$from])) {
             return true;
         }
-		return false;
-	}
+        return false;
+    }
 
     /**
      * 
      */
-	public function get_supported_conversions() {
-		// TODO map on to pandoc supporterd formats.
-		return implode(", ", array_keys($this->supported));
-	}
+    public function get_supported_conversions() {
+        // TODO map on to pandoc supporterd formats.
+        return implode(", ", array_keys($this->supported));
+    }
 
     /**
      * 
