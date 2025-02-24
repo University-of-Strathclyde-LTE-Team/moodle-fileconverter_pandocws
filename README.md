@@ -1,5 +1,6 @@
 # pandoc Web Service Document Converter
-This plugin works in association with the [pandocwebservice](https://github.com/University-of-Strathclyde-LTE-Team/pandocwebservice)
+This plugin works in association with the
+[pandocwebservice](https://github.com/University-of-Strathclyde-LTE-Team/pandocwebservice)
 service to convert documents to different formats using the [pandoc]
 (https://pandoc.org/) converter.
 
@@ -13,8 +14,9 @@ The plugin supports **polling** for the status of the conversion process.
 1. copy the `pandocws/` folder to the `converter/` folder on your Moodle's
    server.
 2. Run the Moodle installation / upgrade process.
-3. Download the [pandocwebservice](https://github.
-   com/University-of-Strathclyde-LTE-Team/pandocwebservice) and deploy in 
+3. Download the 
+   [pandocwebservice](https://github.com/University-of-Strathclyde-LTE-Team/pandocwebservice) 
+4. and deploy in 
    your infrastructure
 4. Configure the `pandocwebservice` URL in the plugin settings.
 5. Enable the plugin in the Moodle admin settings.
