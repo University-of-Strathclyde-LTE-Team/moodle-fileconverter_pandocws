@@ -48,6 +48,7 @@ class converter implements converter_interface {
 
     /**
      * Send a stored file to conversion web service.
+     * @param \core_files\conversion $conversion Conversion record.
      */
     public function start_document_conversion(\core_files\conversion $conversion) {
         $curl = new \curl();
@@ -78,6 +79,7 @@ class converter implements converter_interface {
 
     /**
      * Check the status with the web service about the conversion's state.
+     * @p
      */
     public function poll_conversion_status(conversion $conversion) {
         $taskdata = $conversion->get('data');
@@ -117,8 +119,9 @@ class converter implements converter_interface {
 
     /**
      * Download the converted file and store it locally.
+     * @params \core_files\conversion $conversion Conversion record.
      */
-    protected function store_converted($conversion) {
+    protected function store_converted(conversion $conversion) {
         try {
             $taskdata = $conversion->get('data');
             $taskid = $taskdata->task_id;

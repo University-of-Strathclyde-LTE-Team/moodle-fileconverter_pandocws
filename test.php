@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * TODO describe file test
+ * File Conversion Test page.
  *
  * @package    fileconverter_pandocws
  * @copyright  2025 University Of Strathclyde <education-technology@strath.ac.uk>
