@@ -16,8 +16,7 @@ The plugin supports **polling** for the status of the conversion process.
 2. Run the Moodle installation / upgrade process.
 3. Download the 
    [pandocwebservice](https://github.com/University-of-Strathclyde-LTE-Team/pandocwebservice) 
-4. and deploy in 
-   your infrastructure
+   and deploy in your infrastructure
 4. Configure the `pandocwebservice` URL in the plugin settings.
 5. Enable the plugin in the Moodle admin settings.
 
@@ -44,7 +43,7 @@ There 3 endpoints which this plugin calls:
   download the converted file. This accepts a GET request with the `file_id`
   of the converted file. This returns the converted file, which is then 
   automatically stored in the Moodle file system as part of the conversion 
-  API process, and can then be used by other Moodle such as the Annoated PDF 
+  API process, and can then be used by other Moodle such as the Annotated PDF 
   feedback plugin.
 
 ## Limitations
