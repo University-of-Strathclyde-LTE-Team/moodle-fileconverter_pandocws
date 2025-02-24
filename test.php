@@ -22,8 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
- require(__DIR__ . '/../../../config.php');
- require_once($CFG->libdir . '/filelib.php');
+require(__DIR__ . '/../../../config.php');
+
+defined('MOODLE_INTERNAL') || die();
+
+global $OUTPUT;
+
+require_once($CFG->libdir . '/filelib.php');
+
 use moodle_url;
 $actions = ['send', 'poll', 'download'];
 $action = optional_param('action', "send", PARAM_ALPHA);
@@ -40,18 +46,26 @@ switch($action) {
         $converter->serve_test_document();
         die();
     case 'poll':
+        echo \html_writer::start_tag('ul');
         $conversionid = required_param('conversion', PARAM_INT);
         $conversion = new \core_files\conversion($conversionid);
-        print_r($conversion);
+        echo \html_writer::tag('li', "Initial conversion status: ". $conversion->get('status'));
         $converter->poll_conversion_status($conversion);
-        print_r($conversion);
+        echo \html_writer::start_tag('li');
+        echo ("Conversion status: ". $conversion->get('status'));
         if ($conversion->get('status') == \core_files\conversion::STATUS_COMPLETE) {
-            echo "Completed<br />";
-            echo $OUTPUT->action_link(new \moodle_url('/files/converter/pandocws/test.php', ['action' => 'download', 'conversion' => $conversionid]), 'Download');
+            echo "Completed. ";
+            echo $OUTPUT->action_link(
+                new \moodle_url('/files/converter/pandocws/test.php',
+                    ['action' => 'download', 'conversion' => $conversionid]
+                ),
+                'Download'
+            );
         } else {
-            echo "Not completed";
-            echo "Status: " . $conversion->get('status');
+            echo "Not completed. Status: " . $conversion->get('status');
         }
+        echo \html_writer::end_tag('li');
+        echo \html_writer::end_tag('ul');
         die();
     case 'download':
         $conversionid = required_param('conversion', PARAM_INT);

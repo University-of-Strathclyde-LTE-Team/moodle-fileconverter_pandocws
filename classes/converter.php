@@ -20,6 +20,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/filelib.php');
 
+use core\exception\moodle_exception;
 use stored_file;
 use core_files\conversion;
 use CURLFile;
@@ -40,17 +41,18 @@ class converter implements converter_interface {
      */
     protected $wsurl = "http://172.26.229.18:5000/";
     /**
-     * 
+     * Test that all of the requirements to use this converter are met.
      */
     public static function are_requirements_met(): bool {
+        // Check that the API is accessible.
         return true;
     }
 
     /**
      * Send a stored file to conversion web service.
-     * @param \core_files\conversion $conversion Conversion record.
+     * @param conversion $conversion Conversion record.
      */
-    public function start_document_conversion(\core_files\conversion $conversion) {
+    public function start_document_conversion(conversion $conversion) {
         $curl = new \curl();
         $sourcefile = $conversion->get_sourcefile();
         $filename = $sourcefile->get_filename();
@@ -61,10 +63,9 @@ class converter implements converter_interface {
             'output_format' => $conversion->get('targetformat'),
             'file' => $sourcefile,
         ]);
-        
-        
+
         if (isset($response->error)) {
-            throw new \core\exception\moodle_exception($response->error);
+            throw new moodle_exception($response->error);
         } else {
             var_dump($response);
             $result = json_decode($response);
@@ -79,7 +80,7 @@ class converter implements converter_interface {
 
     /**
      * Check the status with the web service about the conversion's state.
-     * @p
+     * @param conversion $conversion Conversion record.
      */
     public function poll_conversion_status(conversion $conversion) {
         $taskdata = $conversion->get('data');
@@ -88,13 +89,13 @@ class converter implements converter_interface {
         $headers = [];
         $postdata = null;
         $response = download_file_content(
-            $this->wsurl . "status/{$taskid}", 
+            $this->wsurl . "status/{$taskid}",
             $headers,
             $postdata
         );
         $result = json_decode($response);
         if (isset($result->error)) {
-            throw new \core\exception\moodle_exception($result->error);
+            throw new moodle_exception($result->error);
         } else {
             switch(strtolower($result->status)) {
                 case 'pending':
@@ -104,7 +105,7 @@ class converter implements converter_interface {
                     // We can now attempt to download the converted file.
                     if ($this->store_converted($conversion)) {
                         $conversion->set('status', conversion::STATUS_COMPLETE);
-                    } else { 
+                    } else {
                         $conversion->set('status', conversion::STATUS_FAILED);
                     }
                     break;
@@ -119,7 +120,7 @@ class converter implements converter_interface {
 
     /**
      * Download the converted file and store it locally.
-     * @params \core_files\conversion $conversion Conversion record.
+     * @param \core_files\conversion $conversion Conversion record.
      */
     protected function store_converted(conversion $conversion) {
         try {
@@ -128,24 +129,24 @@ class converter implements converter_interface {
             $headers = [];
             $postdata = null;
             $response = download_file_content(
-                $this->wsurl . "download/{$taskid}", 
+                $this->wsurl . "download/{$taskid}",
                 $headers,
                 $postdata,
             );
             // Check the result code.
             if ($response === false) {
-                throw new \core\exception\moodle_exception('Failed to download the converted file');
+                throw new moodle_exception('Failed to download the converted file');
             }
             $conversion->store_destfile_from_string($response);
             $conversion->update();
             return true;
         } catch (\Exception $e) {
-            // TODO log the error
+            debugging($e->getMessage(), DEBUG_NORMAL);
             return false;
         }
     }
     /**
-     * Array of supported from->to formats.
+     * @var array $supported Array of supported from->to formats.
      */
     protected $supported = [
         'docx' => ['pdf', 'html', 'docx'],
@@ -153,7 +154,9 @@ class converter implements converter_interface {
     ];
 
     /**
-     * 
+     * Indicate what formats this plugin supports converting from and to.
+     * @param string $from The source format.
+     * @param string $to The target format.
      */
     public static function supports($from, $to): bool {
         // TODO map on to pandoc supporterd formats.
@@ -164,7 +167,7 @@ class converter implements converter_interface {
     }
 
     /**
-     * 
+     * Return the list of supported conversions.
      */
     public function get_supported_conversions() {
         // TODO map on to pandoc supporterd formats.
@@ -172,7 +175,7 @@ class converter implements converter_interface {
     }
 
     /**
-     * 
+     * Deliver the test page.
      */
     public function serve_test_document() {
         global $CFG, $OUTPUT;
@@ -184,8 +187,8 @@ class converter implements converter_interface {
             'filearea' => 'fileconverter_pandocws',
             'itemid' => 0,
             'filepath' => '/',
-            'filename' => 'conversion_test.docx'
-        ];   
+            'filename' => 'conversion_test.docx',
+        ];
         // Get the fixture doc file content and generate and stored_file object.
         $fs = get_file_storage();
         $testdocx = $fs->get_file($filerecord['contextid'], $filerecord['component'], $filerecord['filearea'],
@@ -196,20 +199,19 @@ class converter implements converter_interface {
             $testdocx = $fs->create_file_from_pathname($filerecord, $fixturefile);
         }
 
-        $conversion = new \core_files\conversion(0, (object) [
+        $conversion = new conversion(0, (object) [
             'targetformat' => 'pdf',
         ]);
         $conversion->set_sourcefile($testdocx);
         $conversion->create();
         $this->start_document_conversion($conversion);
 
-        print_r($conversion);
+        var_dump($conversion);
 
-        $statusurl = new \moodle_url('/files/converter/pandocws/test.php', ['action' => 'poll', 'conversion' => $conversion->get('id')]);
+        $statusurl = new \moodle_url('/files/converter/pandocws/test.php',
+            ['action' => 'poll', 'conversion' => $conversion->get('id')]
+        );
 
         echo $OUTPUT->action_link($statusurl, 'Poll status');
-    }
-    public function poll_document() {
-
     }
 }

@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['pluginname'] = 'Pandoc Document Converter Web Service';
-$string['privacy:metadata'] = 'The Pandoc Web Service plugin doesn\'t store any personal data. 
+$string['privacy:metadata'] = 'The Pandoc Web Service plugin doesn\'t store any personal data.
 
 Personal data contained within documents submitted for conversion however may be passed to an external service.';
 $string['test_converter'] = 'Test the converter';
