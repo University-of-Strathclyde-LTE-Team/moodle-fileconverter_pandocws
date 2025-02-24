@@ -63,6 +63,12 @@ switch($action) {
             );
         } else {
             echo "Not completed. Status: " . $conversion->get('status');
+            echo $OUTPUT->action_link(
+                new \moodle_url('/files/converter/pandocws/test.php',
+                    ['action' => 'poll', 'conversion' => $conversionid]
+                ),
+                'Poll'
+            );
         }
         echo \html_writer::end_tag('li');
         echo \html_writer::end_tag('ul');
